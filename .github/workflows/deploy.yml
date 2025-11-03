@@ -48,4 +48,4 @@ jobs:
             rm -rf /usr/local/nginx/html/*
             cp -r /root/vue3site/* /usr/local/nginx/html/
             /usr/local/nginx/sbin/nginx -s reload
-    EOF
+          EOF
