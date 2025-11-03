@@ -10,42 +10,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 检出代码
+      # 1️⃣ 检出代码
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2. 安装 Node.js
+      # 2️⃣ 安装 Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      # 3. 安装依赖
+      # 3️⃣ 安装依赖
       - name: Install dependencies
         run: npm ci
 
-      # 4. 构建 Vue3 项目
+      # 4️⃣ 构建 Vue3
       - name: Build Vue3
         run: npm run build
 
-      # 5. 写入 SSH 私钥并设置权限
+      # 5️⃣ 写入 SSH 私钥并设置权限
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      # 6. 上传 dist 文件到服务器
+      # 6️⃣ 上传 dist 文件到服务器
       - name: Upload dist to server
         run: |
-          scp -o StrictHostKeyChecking=no -r dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/vue3site/
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/vue3site/
 
-      # 7. 移动到 Nginx 根目录并 reload
+      # 7️⃣ 移动到 Nginx 根目录并 reload
       - name: Deploy to Nginx
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          mkdir -p /usr/local/nginx/html
-          rm -rf /usr/local/nginx/html/*
-          cp -r /root/vue3site/* /usr/local/nginx/html/
-          /usr/local/nginx/sbin/nginx -s reload
-          EOF
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            mkdir -p /usr/local/nginx/html
+            rm -rf /usr/local/nginx/html/*
+            cp -r /root/vue3site/* /usr/local/nginx/html/
+            /usr/local/nginx/sbin/nginx -s reload
+    EOF
