@@ -52,6 +52,7 @@ function placeholder(id) {
   return 'https://picsum.photos/seed/' + id + '/800/600'
 }
 
+
 function formatSize(size) {
   if (!size) return '未知'
   const kb = size / 1024
