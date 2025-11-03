@@ -44,8 +44,12 @@ jobs:
       - name: Deploy to Nginx
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            mkdir -p /usr/local/nginx/html
-            rm -rf /usr/local/nginx/html/*
-            cp -r /root/vue3site/* /usr/local/nginx/html/
+          mkdir -p /usr/local/nginx/html
+          rm -rf /usr/local/nginx/html/*
+          cp -r /root/vue3site/* /usr/local/nginx/html/
+          if [ ! -f /usr/local/nginx/logs/nginx.pid ]; then
+            /usr/local/nginx/sbin/nginx
+          else
             /usr/local/nginx/sbin/nginx -s reload
+          fi
           EOF
