@@ -38,7 +38,7 @@ jobs:
       # 6. 上传 dist 文件到服务器
       - name: Upload dist to server
         run: |
-          scp -r dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/vue3site/
+          scp -o StrictHostKeyChecking=no -r dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/root/vue3site/
 
       # 7. 移动到 Nginx 根目录并 reload
       - name: Deploy to Nginx
