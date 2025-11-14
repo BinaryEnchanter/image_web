@@ -19,7 +19,9 @@
           <p v-if="item.price_cents > 0"><strong>价格：</strong>{{ item.price_cents }} coins</p>
           <div class="actions">
             <button class="btn" @click="download">下载</button>
-            <button class="btn ghost" @click="onFavorite">❤ 收藏</button>
+            <button class="btn ghost" @click="toggleFavorite">
+              {{ isFavorit ? '💔 取消收藏' : '❤ 收藏' }}
+            </button>
 
             <!-- 撤回按钮：只有 uploader 或管理员可见 -->
             <button v-if="canRevoke" class="btn danger" @click="revokeUpload">
@@ -47,6 +49,7 @@ const item = ref(null)
 const loading = ref(true)
 const message = ref('')
 const userStore = useUserStore()
+const isFavorit = ref(false)
 
 function placeholder(id) {
   return 'https://picsum.photos/seed/' + id + '/800/600'
@@ -98,6 +101,7 @@ async function load() {
     // 期望 backend 返回 JSON 中包含:
     // { uuid, name, tags, size, download_count, favorite_count, thumb_url, original_path, owner_uuid, ... }
     item.value = r.data
+    isFavorit.value = item.value.favorite
   } catch (e) {
     console.error('load detail error', e)
     item.value = null
@@ -115,10 +119,13 @@ async function download() {
       return
     }
 
-    // 1. 检查是否已购买
+    // 1. 检查是否已购买 或是不是上传者
+    const curUser = JSON.parse(localStorage.getItem('current_user') || '{}')
+    const isOwner = item.value.owner_uuid === curUser.uuid
     const checkRes = await api.checkPurchase(id)
     const purchased = checkRes.data.purchased
-    if (!purchased) {
+    //console.log(item.value.owner_uuid, curUser.uuid)
+    if (!purchased && !isOwner) {
       // not purchased -> prompt to buy
       const price = item.value?.price_cents || 0
       const confirmMsg = price > 0
@@ -171,6 +178,30 @@ async function onFavorite() {
   } catch (e) {
     console.error(e)
     alert('收藏失败：' + (e.response?.data || e.message))
+  }
+}
+
+async function toggleFavorite() {
+  const jwt = getJwt()
+  if (!jwt) {
+    alert('请先登录')
+    return
+  }
+  try {
+    await load();
+    //console.log(item.value.favorite);
+    if (item.value.favorite === true) {
+      await api.unfavorite(id, jwt)
+      await load();
+      //console.log(item.favorite === true);
+    } else {
+      await api.favorite(id, jwt)
+      await load();
+      //console.log(item.favorite === true);
+    }
+  } catch (err) {
+    console.log(err)
+    alert(err.response?.data?.error || '操作失败')
   }
 }
 
