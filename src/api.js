@@ -16,7 +16,11 @@ export default {
   login(data){ return API.post('/api/v1/auth/login', data) },
   getWallpapers(page=1){ return API.get('/api/v1/wallpapers?page='+page) },
   search(q,page=1){ return API.get('/api/v1/wallpapers/search?q='+encodeURIComponent(q)+'&page='+page) },
-  detail(uuid){ return API.get('/api/v1/wallpapers/'+uuid) },
+  detail(uuid) {
+    const token = localStorage.jwt_token;
+    return API.get(`/api/v1/wallpapers/${uuid}`, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }) },
   download(uuid){ return API.get('/api/v1/wallpapers/'+uuid+'/download') },
   upload(formData){ return API.post('/api/v1/wallpapers/upload', formData, { headers:{ 'Content-Type':'multipart/form-data' } }) },
   me() { return API.get('/api/v1/users/me') },
@@ -25,7 +29,8 @@ export default {
       headers: { Authorization: `Bearer ${jwt}` }
     });
   },
-  favorite(uuid, jwt){return API.post(`/api/v1/wallpapers/${uuid}/favorite?jwt=${jwt}`)},
+  favorite(uuid, jwt) { return API.post(`/api/v1/wallpapers/${uuid}/favorite?jwt=${jwt}`) },
+  unfavorite(uuid, jwt){return API.delete(`/api/v1/wallpapers/${uuid}/favorite?jwt=${jwt}`)},
   purchase(uuid) { return API.post('/api/v1/wallpapers/' + uuid + '/purchase') },
   deleteWallpaper(uuid, jwt) {
     return API.delete(`/api/v1/wallpapers/${uuid}`, {
@@ -48,4 +53,10 @@ export default {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
   },
+  aichat(t) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/ai/chat`, { message: t }, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  }
 }

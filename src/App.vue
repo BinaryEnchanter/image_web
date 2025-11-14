@@ -34,6 +34,10 @@
       © {{ new Date().getFullYear() }} 壁纸中心 — 演示前端
     </footer>
   </div>
+  <div id="app">
+    <router-view />
+    <ChatWidget />
+  </div>
 </template>
 
 <script setup>
@@ -41,7 +45,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from './store/user'
 import api from './api'
-
+import ChatWidget from './pages/ChatWidget.vue'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
