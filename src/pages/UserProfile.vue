@@ -91,8 +91,10 @@ onMounted(load)
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-weight: 600
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .2s ease
 }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
 
 .btn.ghost {
   background: transparent;
@@ -111,13 +113,15 @@ onMounted(load)
   overflow: hidden;
   padding: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent);
-  transition: transform .18s ease, box-shadow .18s ease
+  transition: transform .2s ease, box-shadow .2s ease;
+  animation: tileFadeUp .35s ease both
 }
 
 .tile:hover {
   transform: translateY(-6px);
   box-shadow: 0 10px 30px rgba(11, 18, 32, 0.6)
 }
+@keyframes tileFadeUp { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
 
 .thumb {
   width: 100%;

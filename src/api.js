@@ -1,6 +1,6 @@
 import axios from 'axios'
 const API = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://47.109.41.86:8080',
   timeout: 10000
 })
 
@@ -16,7 +16,11 @@ export default {
   login(data){ return API.post('/api/v1/auth/login', data) },
   getWallpapers(page=1){ return API.get('/api/v1/wallpapers?page='+page) },
   search(q,page=1){ return API.get('/api/v1/wallpapers/search?q='+encodeURIComponent(q)+'&page='+page) },
-  detail(uuid){ return API.get('/api/v1/wallpapers/'+uuid) },
+  detail(uuid) {
+    const token = localStorage.jwt_token;
+    return API.get(`/api/v1/wallpapers/${uuid}`, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }) },
   download(uuid){ return API.get('/api/v1/wallpapers/'+uuid+'/download') },
   upload(formData){ return API.post('/api/v1/wallpapers/upload', formData, { headers:{ 'Content-Type':'multipart/form-data' } }) },
   me() { return API.get('/api/v1/users/me') },
@@ -25,7 +29,8 @@ export default {
       headers: { Authorization: `Bearer ${jwt}` }
     });
   },
-  favorite(uuid, jwt){return API.post(`/api/v1/wallpapers/${uuid}/favorite?jwt=${jwt}`)},
+  favorite(uuid, jwt) { return API.post(`/api/v1/wallpapers/${uuid}/favorite?jwt=${jwt}`) },
+  unfavorite(uuid, jwt){return API.delete(`/api/v1/wallpapers/${uuid}/favorite?jwt=${jwt}`)},
   purchase(uuid) { return API.post('/api/v1/wallpapers/' + uuid + '/purchase') },
   deleteWallpaper(uuid, jwt) {
     return API.delete(`/api/v1/wallpapers/${uuid}`, {
@@ -48,4 +53,77 @@ export default {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
   },
+  aichat(t) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/ai/chat`, { message: t }, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+
+  updateUsername(newUsername) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/users/me/username`, { newUsername:newUsername },{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+
+  // 更新邮箱
+  updateEmail(newEmail) {
+    const token = localStorage.jwt_token
+      return API.post(`/api/v1/users/me/email`, { newEmail:newEmail },{
+        headers: { Authorization: token ? `Bearer ${token}` : '' }
+      })
+  },
+
+  // 更新密码
+  updatePassword(newPassword) {
+    const token = localStorage.jwt_token
+      return API.post(`/api/v1/users/me/password`, { newPassword:newPassword },{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+  adminSetRole(uuid, role) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/admin/users/${uuid}/role`, { role }, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+  adminGetUserLogs(uuid, page = 1, size = 20) {
+    const token = localStorage.jwt_token
+    return API.get(`/api/v1/admin/users/${uuid}/logs?page=${page}&size=${size}`, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+  listComments(uuid, page = 1, size = 20) {
+    const token = localStorage.jwt_token
+    return API.get(`/api/v1/wallpapers/${uuid}/comments?page=${page}&size=${size}&_=${Date.now()}`,{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+  addComment(uuid, content, parentId = null) {
+    const data = { content }
+    const token = localStorage.jwt_token
+    if (parentId != null) data.parent_id = parentId
+    return API.post(`/api/v1/wallpapers/${uuid}/comments`, data),{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }
+  },
+  likeComment(id) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/comments/${id}/like`),{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }
+  },
+  dislikeComment(id) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/comments/${id}/dislike`),{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }
+  },
+  deleteComment(id) {
+    const token = localStorage.jwt_token
+    return API.delete(`/api/v1/comments/${id}`),{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    }
+  }
 }

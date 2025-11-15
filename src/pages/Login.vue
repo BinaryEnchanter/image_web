@@ -63,7 +63,85 @@ function goRegister() {
 </script>
 
 <style>
-/* 使用你原来的样式，保持一致 */
+:root {
+  --bg: #0f1724;
+  --card: #0b1220;
+  --accent: #3b82f6;
+  --muted: #9aa4b2;
+  --text: #e6eef6;
+  --glass: rgba(255, 255, 255, 0.03);
+}
+
+* {
+  box-sizing: border-box
+}
+
+.page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px
+}
+
+.login-card {
+  padding: 20px;
+  max-width: 420px;
+  width: 100%;
+  border-radius: 12px;
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,.06);
+  box-shadow: 0 18px 40px rgba(11,18,32,.45);
+  animation: cardIn .28s ease both
+}
+
+h2 {
+  margin: 0 0 8px 0
+}
+
+.input {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  color: var(--text);
+  margin-top: 8px;
+  transition: border-color .2s ease, box-shadow .2s ease
+}
+.input:focus { border-color: rgba(59,130,246,.6); box-shadow: 0 0 0 3px rgba(59,130,246,.18) }
+
+.actions {
+  display: flex;
+  gap: 8px
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .2s ease
+}
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--text)
+}
+
+.error {
+  margin-top: 10px;
+  color: #ff7b7b
+}
+
+@keyframes cardIn { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
+@media (max-width:560px) { .login-card { padding: 16px } }
 </style>
 
 <style scoped>

@@ -20,6 +20,7 @@
             💰 {{ user.coins || 0 }}
             <span class="recharge-text">（充值）</span>
           </button>
+          <router-link v-if="user && (user.role === 'admin' || user.isAdmin)" to="/admin" class="nav-link">管理</router-link>
           <router-link to="/me" class="nav-link">个人中心</router-link>
           <button class="btn ghost" @click="logout">登出</button>
         </div>
@@ -33,6 +34,7 @@
     <footer class="footer">
       © {{ new Date().getFullYear() }} 壁纸中心 — 演示前端
     </footer>
+    <ChatWidget />
   </div>
 </template>
 
@@ -41,7 +43,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from './store/user'
 import api from './api'
-
+import ChatWidget from './pages/ChatWidget.vue'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.user)
