@@ -26,9 +26,9 @@
       </nav>
     </header>
 
-    <main class="container main-content">
+    <!-- <main class="container main-content">
       <router-view />
-    </main>
+    </main> -->
 
     <footer class="footer">
       © {{ new Date().getFullYear() }} 壁纸中心 — 演示前端
