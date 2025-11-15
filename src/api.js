@@ -58,5 +58,28 @@ export default {
     return API.post(`/api/v1/ai/chat`, { message: t }, {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
+  },
+
+  updateUsername(newUsername) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/users/me/username`, { newUsername:newUsername },{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+
+  // 更新邮箱
+  updateEmail(newEmail) {
+    const token = localStorage.jwt_token
+      return API.post(`/api/v1/users/me/email`, { newEmail:newEmail },{
+        headers: { Authorization: token ? `Bearer ${token}` : '' }
+      })
+  },
+
+  // 更新密码
+  updatePassword(newPassword) {
+    const token = localStorage.jwt_token
+      return API.post(`/api/v1/users/me/password`, { newPassword:newPassword },{
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
   }
 }
