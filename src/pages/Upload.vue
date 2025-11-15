@@ -4,7 +4,7 @@
       <h3>上传壁纸</h3>
 
       <div class="form" style="margin-top:12px">
-        <!-- 使用 for + id 方式避免双重触发文件选择对话框 -->
+        <!-- 文件选择区 -->
         <label for="fileInput" class="file-drop" @dragover.prevent @drop.prevent="onDrop">
           <input id="fileInput" type="file" ref="fileInput" class="visually-hidden" @change="onFileChange" />
 
@@ -14,8 +14,44 @@
           <img v-if="preview" :src="preview" class="thumb preview" />
         </label>
 
-        <input v-model="name" class="input" placeholder="名称（必填）" />
-        <input v-model="tags" class="input" placeholder="标签，逗号分隔（可选）" />
+        <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
+          <input v-model="name" class="input" placeholder="名称（必填）" />
+          <button class="btn ghost" @click="generateName" :disabled="aiNameLoading">AI 生成名称</button>
+        </div>
+
+        <!-- 标签输入和已选标签 -->
+        <div style="margin-top:8px">
+          <div class="tag-input-wrap">
+            <div class="tags">
+              <span v-for="(t, idx) in tagsArray" :key="t" class="tag">
+                {{ t }} <button class="tag-remove" @click.prevent="removeTag(idx)">×</button>
+              </span>
+              <input v-model="tagInput" @keydown.enter.prevent="pushTagFromInput" @keydown.stop="onTagKeydown"
+                @blur="pushTagFromInput" class="tag-input" placeholder="添加标签，按回车或逗号分隔" />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+            <button class="btn" @click="generateTags" :disabled="aiTagsLoading">AI 生成标签</button>
+            <button class="btn ghost" @click="clearTags">清空标签</button>
+            <div class="muted">已选择 {{ tagsArray.length }} 个标签</div>
+          </div>
+
+          <!-- AI 建议标签（不自动加入提交） -->
+          <div v-if="aiSuggestions.length" class="ai-suggestions">
+            <div class="ai-suggestions-title">AI 建议标签（点击“添加”加入提交标签）</div>
+            <div class="ai-list">
+              <div v-for="(s, i) in aiSuggestions" :key="s" class="ai-item">
+                <div class="ai-tag-text">{{ s }}</div>
+                <div class="ai-item-actions">
+                  <button class="btn small" @click="addTagFromSuggestion(s)"
+                    :disabled="tagsArray.includes(s)">添加</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
 
         <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
           <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" v-model="paid" /> 收费</label>
@@ -35,12 +71,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import api from '../api'
 
 const fileInput = ref(null)
 const name = ref('')
-const tags = ref('')
+const tagInput = ref('')
+const tagsArray = ref([]) // 最终提交的标签集合
 const paid = ref(false)
 const price = ref(0)
 const msg = ref(null)
@@ -48,6 +85,11 @@ const msgType = ref('')
 const preview = ref(null)
 const uploading = ref(false)
 const progress = ref(0)
+
+// AI 相关
+const aiSuggestions = ref([]) // AI 建议但未自动加入提交的标签
+const aiTagsLoading = ref(false)
+const aiNameLoading = ref(false)
 
 function onDrop(e) {
   const dt = e.dataTransfer
@@ -68,18 +110,19 @@ function handleFileSelect(f) {
     msgType.value = 'error'
     return
   }
-  // 不要清空 input，这样后续上传不会重复触发选择
+  // 预览
   preview.value = URL.createObjectURL(f)
   msg.value = null
 }
 
 function reset() {
-  // 清除文件选择但不触发文件对话框
   if (fileInput.value) fileInput.value.value = null
   if (preview.value) { URL.revokeObjectURL(preview.value) }
   preview.value = null
   name.value = ''
-  tags.value = ''
+  tagInput.value = ''
+  tagsArray.value = []
+  aiSuggestions.value = []
   paid.value = false
   price.value = 0
   msg.value = null
@@ -87,6 +130,105 @@ function reset() {
   progress.value = 0
 }
 
+// 标签操作
+function normalizeTag(t) {
+  return String(t || '').trim().replace(/\s+/g, ' ')
+}
+
+function pushTag(tagRaw) {
+  const t = normalizeTag(tagRaw)
+  if (!t) return
+  if (tagsArray.value.includes(t)) return
+  tagsArray.value.push(t)
+}
+
+function pushTagFromInput() {
+  if (!tagInput.value) return
+  // 支持逗号分割
+  const parts = tagInput.value.split(/[，,]+/).map(s => s.trim()).filter(Boolean)
+  parts.forEach(p => pushTag(p))
+  tagInput.value = ''
+}
+
+function onTagKeydown(e) {
+  // 当按下逗号键时把当前输入作为 tag
+  if (e.key === ',') {
+    e.preventDefault()
+    pushTagFromInput()
+  }
+}
+
+function removeTag(idx) {
+  tagsArray.value.splice(idx, 1)
+}
+
+function clearTags() {
+  tagsArray.value = []
+}
+
+function addTagFromSuggestion(s) {
+  pushTag(s)
+}
+
+// AI 生成标签 -> 向后端请求（可以上传图片以辅助生成）
+async function generateTags() {
+  msg.value = null
+  aiSuggestions.value = []
+  const f = fileInput.value?.files?.[0]
+  try {
+    aiTagsLoading.value = true
+    // 使用 FormData 将文件发送到后端，后端返回标签数组
+    const fd = new FormData()
+    if (f) fd.append('image', f)
+    // 也可以传入当前文本 name 或已有标签做上下文
+    if (name.value) fd.append('name', name.value)
+
+    // 假设 api.generateTags(fd) 返回 { data: ['标签1','标签2'] }
+    const res = await api.generateTags(fd)
+    const arr = res.data?.tags || res.data || []
+    if (Array.isArray(arr)) {
+      aiSuggestions.value = arr.map(a => String(a).trim()).filter(Boolean)
+      if (!aiSuggestions.value.length) msg.value = 'AI 未生成标签'
+    } else {
+      msg.value = 'AI 返回格式错误'
+      msgType.value = 'error'
+    }
+  } catch (e) {
+    console.error(e)
+    msg.value = e.response?.data?.message || '生成标签失败'
+    msgType.value = 'error'
+  } finally {
+    aiTagsLoading.value = false
+  }
+}
+
+// AI 生成名称 -> 向后端请求
+async function generateName() {
+  msg.value = null
+  const f = fileInput.value?.files?.[0]
+  try {
+    aiNameLoading.value = true
+    const fd = new FormData()
+    if (f) fd.append('image', f)
+    // 你也可以传入当前 tags 用作上下文
+    if (tagsArray.value.length) fd.append('tags', tagsArray.value.join(','))
+    const res = await api.generateName(fd)
+    const n = res.data?.name || res.data
+    if (n) name.value = String(n)
+    else {
+      msg.value = 'AI 未生成名称'
+      msgType.value = 'error'
+    }
+  } catch (e) {
+    console.error(e)
+    msg.value = e.response?.data?.message || '生成名称失败'
+    msgType.value = 'error'
+  } finally {
+    aiNameLoading.value = false
+  }
+}
+
+// 提交上传
 async function upload() {
   msg.value = null
   msgType.value = ''
@@ -97,7 +239,7 @@ async function upload() {
   const fd = new FormData()
   fd.append('image', f)
   fd.append('name', name.value)
-  fd.append('tags', tags.value)
+  fd.append('tags', tagsArray.value.join(','))
   fd.append('paid', paid.value ? '1' : '0')
   fd.append('price', paid.value ? String(price.value || 0) : '0')
 
@@ -114,6 +256,7 @@ async function upload() {
     })
     msg.value = '上传成功'
     msgType.value = 'success'
+    // 上传完成后可选择清空或保留当前状态
   } catch (e) {
     console.error(e)
     msg.value = e.response?.data?.message || '上传失败'
@@ -230,6 +373,81 @@ async function upload() {
 
 .msg.success {
   color: #7bffb8
+}
+
+/* 标签样式 */
+.tag-input-wrap {
+  margin-top: 8px
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04)
+}
+
+.tag {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px
+}
+
+.tag-remove {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px
+}
+
+.tag-input {
+  min-width: 100px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  padding: 6px
+}
+
+/* AI 建议 */
+.ai-suggestions {
+  margin-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.03);
+  padding-top: 8px
+}
+
+.ai-suggestions-title {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px
+}
+
+.ai-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px
+}
+
+.ai-item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.ai-tag-text {
+  font-size: 13px
 }
 
 @media (max-width:560px) {

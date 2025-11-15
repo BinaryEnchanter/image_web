@@ -117,6 +117,9 @@ export default {
   gap: 20px;
   align-items: center;
   padding: 24px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 18px 40px rgba(11,18,32,.45);
 }
 
 .hero-left h1 {
@@ -153,7 +156,9 @@ export default {
   border: none;
   cursor: pointer;
   font-weight: 600;
+  transition: transform .15s ease, box-shadow .2s ease
 }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
 
 .thumb {
   width: 100%;
@@ -166,7 +171,9 @@ export default {
   height: 260px;
   border-radius: 14px;
   box-shadow: 0 8px 30px rgba(11, 18, 32, 0.6);
+  transition: transform .3s ease
 }
+.thumb.large:hover { transform: scale(1.02) }
 
 .grid {
   display: grid;
@@ -179,13 +186,15 @@ export default {
   overflow: hidden;
   padding: 0;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
+  animation: tileFadeUp .35s ease both
 }
 
 .tile:hover {
   transform: translateY(-10px) scale(1.06);
   box-shadow: 0 20px 50px rgba(11, 18, 32, 0.6);
 }
+@keyframes tileFadeUp { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
 
 .meta {
   padding: 10px;

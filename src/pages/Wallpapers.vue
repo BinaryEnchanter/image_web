@@ -137,8 +137,10 @@ export default {
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-weight: 600
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .2s ease
 }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
 
 .btn.ghost {
   background: transparent;
@@ -168,6 +170,7 @@ export default {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.012), transparent);
   transition: transform .25s ease, box-shadow .25s ease;
   will-change: transform;
+  animation: tileFadeUp .35s ease both
 }
 
 .tile:hover {
@@ -179,10 +182,11 @@ export default {
 .thumb {
   width: 100%;
   height: 260px;
-  /* 更大卡片 */
   object-fit: cover;
   border-radius: 12px;
+  transition: transform .25s ease
 }
+.tile:hover .thumb { transform: scale(1.03) }
 
 .meta {
   padding: 10px
@@ -212,15 +216,10 @@ export default {
   box-shadow: 0 20px 50px rgba(11, 18, 32, 0.6);
 }
 
+@keyframes tileFadeUp { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
 @media (max-width:980px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .thumb {
-    height: 200px;
-  }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 16px }
+  .thumb { height: 200px }
 }
 
 @media (max-width:560px) {

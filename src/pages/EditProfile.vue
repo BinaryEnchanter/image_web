@@ -127,7 +127,9 @@ onMounted(loadUser)
     margin-bottom: 22px;
     padding-bottom: 14px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    animation: fadeIn .28s ease both
 }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: translateY(0) } }
 
 input {
     width: 100%;
@@ -137,7 +139,9 @@ input {
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
     color: #e6eef6;
+    transition: border-color .2s ease, box-shadow .2s ease
 }
+input:focus { border-color: rgba(59,130,246,.5); box-shadow: 0 0 0 3px rgba(59,130,246,.18) }
 
 .msg {
     margin-top: 12px;
@@ -153,7 +157,9 @@ input {
     color: #fff;
     font-weight: 600;
     cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease
 }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
 
 .btn.danger {
     background: #ef4444;

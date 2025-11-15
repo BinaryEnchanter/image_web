@@ -244,7 +244,10 @@ onMounted(load)
   width: 100%;
   padding: 24px;
   border-radius: 12px;
-  background: var(--glass)
+  background: var(--glass);
+  border: 1px solid rgba(255,255,255,.06);
+  box-shadow: 0 20px 60px rgba(2,6,23,.7);
+  animation: cardIn .3s ease both
 }
 
 .loading {
@@ -268,8 +271,10 @@ onMounted(load)
   width: 100%;
   border-radius: 10px;
   object-fit: cover;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, .3)
+  box-shadow: 0 8px 30px rgba(11, 18, 32, .6);
+  transition: transform .3s ease, box-shadow .3s ease
 }
+.thumb.large:hover { transform: scale(1.02); box-shadow: 0 18px 50px rgba(11,18,32,.7) }
 
 .info {
   flex: 1 1 40%;
@@ -292,8 +297,10 @@ onMounted(load)
   border-radius: 10px;
   border: none;
   cursor: pointer;
-  font-weight: 600
+  font-weight: 600;
+  transition: transform .15s ease, box-shadow .2s ease
 }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
 
 .btn.ghost {
   background: transparent;
@@ -301,7 +308,6 @@ onMounted(load)
   color: var(--text)
 }
 
-.btn.danger {
-  background: #ef4444
-}
+.btn.danger { background: #ef4444 }
+@keyframes cardIn { from { opacity: 0; transform: translateY(8px) } to { opacity: 1; transform: translateY(0) } }
 </style>

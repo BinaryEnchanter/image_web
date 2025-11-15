@@ -108,9 +108,10 @@ onMounted(loadProfile)
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.06);
-
-    cursor: pointer
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease
 }
+.preset:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.25) }
 
 .preset.active {
     background: var(--accent);
@@ -123,8 +124,10 @@ onMounted(loadProfile)
     padding: 8px 12px;
     border-radius: 8px;
     border: none;
-    cursor: pointer
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease
 }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(59,130,246,.35) }
 
 .btn.ghost {
     background: transparent;

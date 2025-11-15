@@ -96,7 +96,9 @@ async function scrollBottom() {
     justify-content: center;
     font-weight: 700;
     cursor: pointer;
+    transition: transform .15s ease, box-shadow .2s ease
 }
+.fab:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 16px 36px rgba(0,0,0,.45) }
 
 .panel {
     width: 340px;
@@ -108,6 +110,7 @@ async function scrollBottom() {
     color: #e6eef6;
     box-shadow: 0 20px 60px rgba(2, 6, 23, .7);
     transform-origin: bottom right;
+    border: 1px solid rgba(255,255,255,.06);
 }
 
 .header {
