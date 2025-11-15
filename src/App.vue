@@ -20,22 +20,20 @@
             💰 {{ user.coins || 0 }}
             <span class="recharge-text">（充值）</span>
           </button>
+          <router-link v-if="user && (user.role === 'admin' || user.isAdmin)" to="/admin" class="nav-link">管理</router-link>
           <router-link to="/me" class="nav-link">个人中心</router-link>
           <button class="btn ghost" @click="logout">登出</button>
         </div>
       </nav>
     </header>
 
-    <!-- <main class="container main-content">
+    <main class="container main-content">
       <router-view />
-    </main> -->
+    </main>
 
     <footer class="footer">
       © {{ new Date().getFullYear() }} 壁纸中心 — 演示前端
     </footer>
-  </div>
-  <div id="app">
-    <router-view />
     <ChatWidget />
   </div>
 </template>

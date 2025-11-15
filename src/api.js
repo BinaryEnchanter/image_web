@@ -81,5 +81,17 @@ export default {
       return API.post(`/api/v1/users/me/password`, { newPassword:newPassword },{
       headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
+  },
+  adminSetRole(uuid, role) {
+    const token = localStorage.jwt_token
+    return API.post(`/api/v1/admin/users/${uuid}/role`, { role }, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
+  },
+  adminGetUserLogs(uuid, page = 1, size = 20) {
+    const token = localStorage.jwt_token
+    return API.get(`/api/v1/admin/users/${uuid}/logs?page=${page}&size=${size}`, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
   }
 }

@@ -15,7 +15,8 @@ const routes = [
   { path: '/image/:id', component: ImageDetail, props: true },
   { path: '/upload', component: Upload },
   { path: '/recharge', component: Recharge },
-  { path: '/me/edit', component: () => import('../pages/EditProfile.vue') }
+  { path: '/me/edit', component: () => import('../pages/EditProfile.vue') },
+  { path: '/admin', component: () => import('../pages/Admin.vue') }
 ]
 
 const router = createRouter({
