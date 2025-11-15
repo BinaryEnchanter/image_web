@@ -6,11 +6,14 @@ import UserProfile from '../pages/UserProfile.vue'
 import ImageDetail from '../pages/ImageDetail.vue'
 import Upload from '../pages/Upload.vue'
 import Recharge from '../pages/Recharge.vue'
+import Register from '../pages/register.vue'
+
 
 const routes = [
   { path: '/', component: Home },
   { path: '/wallpapers', component: Wallpapers },
   { path: '/login', component: Login },
+  { path: '/register', component: Register },
   { path: '/me', component: UserProfile },
   { path: '/image/:id', component: ImageDetail, props: true },
   { path: '/upload', component: Upload },

@@ -1,0 +1,5 @@
+{
+  "model_type": "clip",
+  "vision_model": "vision_model_q4f16.onnx",
+  "text_model": "text_model_q4f16.onnx"
+}
