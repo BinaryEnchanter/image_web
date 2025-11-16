@@ -101,29 +101,35 @@ export default {
     })
   },
   addComment(uuid, content, parentId = null) {
-    const data = { content }
     const token = localStorage.jwt_token
+    const data = { content }
     if (parentId != null) data.parent_id = parentId
-    return API.post(`/api/v1/wallpapers/${uuid}/comments`, data),{
+    return API.post(`/api/v1/wallpapers/${uuid}/comments`, data, {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
-    }
+    })
   },
   likeComment(id) {
     const token = localStorage.jwt_token
-    return API.post(`/api/v1/comments/${id}/like`),{
+    return API.post(`/api/v1/comments/${id}/like`, null, {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
-    }
+    })
   },
   dislikeComment(id) {
     const token = localStorage.jwt_token
-    return API.post(`/api/v1/comments/${id}/dislike`),{
+    return API.post(`/api/v1/comments/${id}/dislike`, null, {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
-    }
+    })
   },
   deleteComment(id) {
     const token = localStorage.jwt_token
-    return API.delete(`/api/v1/comments/${id}`),{
+    return API.delete(`/api/v1/comments/${id}`, {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
-    }
+    })
+  },
+  adminStats() {
+    const token = localStorage.jwt_token
+    return API.get(`/api/v1/admin/stats`, {
+      headers: { Authorization: token ? `Bearer ${token}` : '' }
+    })
   }
 }

@@ -41,7 +41,7 @@
         </div>
         <div v-if="!userStore.user" class="muted" style="margin-top:6px">请登录后发表评论</div>
         <div v-if="loadingComments" class="muted" style="margin-top:8px">加载评论中...</div>
-        <div v-else>
+        <div v-else class="comments-scroll">
           <div v-if="comments.length === 0" class="muted">暂无评论</div>
           <div v-else>
             <div class="comment-item" v-for="c in displayComments" :key="c.id"
@@ -560,4 +560,8 @@ onMounted(() => {
     transform: translateY(0)
   }
 }
+.comments { margin-top:16px }
+.comments-scroll { max-height:420px; overflow:auto; padding-right:4px }
+.comment-item { word-break: break-word }
+.comment-form .input { resize: vertical; max-height:160px }
 </style>
