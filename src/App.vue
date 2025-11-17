@@ -9,14 +9,14 @@
       <nav class="nav">
         <router-link to="/" class="nav-link">首页</router-link>
         <router-link to="/wallpapers" class="nav-link">壁纸</router-link>
-
+        <!-- 上传按钮移到这里，让所有用户都能看到 -->
+        <router-link to="/upload" class="nav-link">上传</router-link>
 
         <div v-if="!user">
           <router-link to="/login" class="btn">登录</router-link>
         </div>
 
         <div v-else class="topbar-info">
-          <router-link to="/upload" class="nav-link">上传</router-link>
           <button class="btn ghost" @click="goRecharge">
             💰 {{ user.coins || 0 }}
             <span class="recharge-text">（充值）</span>
