@@ -9,18 +9,20 @@
       <nav class="nav">
         <router-link to="/" class="nav-link">首页</router-link>
         <router-link to="/wallpapers" class="nav-link">壁纸</router-link>
-        <router-link to="/upload" class="nav-link">上传</router-link>
+
 
         <div v-if="!user">
           <router-link to="/login" class="btn">登录</router-link>
         </div>
 
         <div v-else class="topbar-info">
+          <router-link to="/upload" class="nav-link">上传</router-link>
           <button class="btn ghost" @click="goRecharge">
             💰 {{ user.coins || 0 }}
             <span class="recharge-text">（充值）</span>
           </button>
-          <router-link v-if="user && (user.role === 'admin' || user.isAdmin)" to="/admin" class="nav-link">管理</router-link>
+          <router-link v-if="user && (user.role === 'admin' || user.isAdmin)" to="/admin"
+            class="nav-link">管理</router-link>
           <router-link to="/me" class="nav-link">个人中心</router-link>
           <button class="btn ghost" @click="logout">登出</button>
         </div>
@@ -66,8 +68,7 @@ async function load() {
   }
 }
 
-function logout() {
-  localStorage.removeItem('jwt_token')
+async function logout() {
   userStore.logout()
   router.push('/login')
 }
