@@ -32,6 +32,20 @@
           <div v-if="message" style="margin-top:10px;color:var(--muted)">{{ message }}</div>
         </div>
       </div>
+      <section v-if="similarItems.length" class="card" style="margin-top:12px">
+        <div class="section-head">
+          <h3>相似图片</h3>
+          <div class="muted">根据标签相似推荐</div>
+        </div>
+        <div class="row-scroll">
+          <div v-for="s in similarItems" :key="s.uuid" class="tile rec-tile">
+            <router-link :to="`/image/${s.uuid}`">
+              <img :src="s.thumbUrl || placeholder(s.uuid)" class="thumb" />
+            </router-link>
+            <div class="meta"><div class="title">{{ s.name || '未命名' }}</div></div>
+          </div>
+        </div>
+      </section>
       <div class="comments">
         <h3>评论</h3>
         <div class="comment-form" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px">
@@ -106,6 +120,7 @@ const replyingMap = ref({})
 const likingMap = ref({})
 const dislikingMap = ref({})
 const displayComments = ref([])
+const similarItems = ref([])
 
 function placeholder(id) {
   return 'https://picsum.photos/seed/' + id + '/800/600'
@@ -337,6 +352,15 @@ async function load() {
   }
 }
 
+async function loadSimilar() {
+  try {
+    const r = await api.similarWallpapers(id, 4)
+    similarItems.value = Array.isArray(r.data) ? r.data : []
+  } catch (e) {
+    similarItems.value = []
+  }
+}
+
 async function download() {
   try {
     const jwt = getJwt()
@@ -448,6 +472,7 @@ async function revokeUpload() {
 onMounted(() => {
   load()
   loadComments()
+  loadSimilar()
 })
 </script>
 
@@ -564,4 +589,6 @@ onMounted(() => {
 .comments-scroll { max-height:420px; overflow:auto; padding-right:4px }
 .comment-item { word-break: break-word }
 .comment-form .input { resize: vertical; max-height:160px }
+.row-scroll { display:flex; overflow-x:auto; gap:12px; padding-bottom:8px }
+.rec-tile { min-width:220px; flex:0 0 auto }
 </style>

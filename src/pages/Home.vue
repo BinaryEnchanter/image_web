@@ -16,6 +16,21 @@
 
       </section>
 
+      <section v-if="isLogged && recs.length" class="card">
+        <div class="section-head">
+          <h3>为你推荐</h3>
+          <div class="muted">基于你的喜好</div>
+        </div>
+        <div class="row-scroll">
+          <div v-for="w in recs" :key="w.uuid" class="tile rec-tile">
+            <router-link :to="`/image/${w.uuid}`">
+              <img :src="w.thumbUrl || placeholder(w.uuid)" class="thumb" />
+            </router-link>
+            <div class="meta"><div class="title">{{ w.name || '未命名' }}</div></div>
+          </div>
+        </div>
+      </section>
+
       <!-- 推荐壁纸 -->
       <section class="card">
         <div class="section-head">
@@ -47,10 +62,14 @@
 
 <script>
 import api from '../api'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useUserStore } from '../store/user'
 
 export default {
   setup() {
+    const userStore = useUserStore()
+    const isLogged = computed(() => !!userStore.user)
+    const recs = ref([])
     const items = ref([])
     const q = ref('')
     const heroImage = 'https://picsum.photos/seed/hero/800/480'
@@ -61,12 +80,23 @@ export default {
 
     async function load() {
       try {
-        const res = await api.getWallpapers(1) // 获取第一页数据
+        const res = await api.getWallpapers(1)
         items.value = res.data.items || []
       } catch (e) {
         console.error(e)
       }
     }
+
+    async function loadRecommendations() {
+      try {
+        const r = await api.myRecommendations(4)
+        recs.value = Array.isArray(r.data) ? r.data : []
+      } catch (e) {
+        recs.value = []
+      }
+    }
+
+    watch(isLogged, (v) => { if (v) loadRecommendations() }, { immediate: true })
 
     function goSearch() {
       if (!q.value.trim()) {
@@ -78,7 +108,7 @@ export default {
     }
 
     onMounted(load)
-    return { items, q, heroImage, goSearch, placeholder }
+    return { items, recs, isLogged, q, heroImage, goSearch, placeholder }
   }
 }
 </script>
@@ -181,6 +211,9 @@ export default {
   gap: 16px;
   margin-top: 12px;
 }
+
+.row-scroll { display:flex; overflow-x:auto; gap:12px; padding-bottom:8px }
+.rec-tile { min-width:220px; flex:0 0 auto }
 
 .tile {
   overflow: hidden;

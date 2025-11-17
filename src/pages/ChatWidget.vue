@@ -31,12 +31,14 @@
 
 <script setup>
 import { ref, nextTick } from 'vue'
-import api from '../api' // 你的 axios 封装
+import { useRoute } from 'vue-router'
+import api from '../api'
 
 const open = ref(false)
 const text = ref('')
-const msgs = ref([])  // ✅ 确保是数组
+const msgs = ref([])
 const msgsContainer = ref(null)
+const route = useRoute()
 
 function toggleChat() {
     open.value = !open.value
@@ -54,7 +56,13 @@ async function send() {
 
     try {
         // 调用后端 API
-        const res = await api.aichat(content)
+        const res = await api.aichat({
+            message: content,
+            input: content,
+            route: route.fullPath,
+            screen: route.path,
+            ts: Date.now()
+        })
         const reply = res?.data?.reply || '抱歉，AI 没有返回内容。'
 
         // ✅ AI 回复
@@ -62,6 +70,16 @@ async function send() {
     } catch (err) {
         console.error('AI Chat Error:', err)
         msgs.value.push({ role: 'assistant', content: 'AI 服务暂时不可用，请稍后再试。' })
+        try {
+            api.aichat({
+                event: 'client_error',
+                route: route.fullPath,
+                screen: route.path,
+                lastUserMessage: content,
+                error: (err && (err.response?.data?.error || err.message)) || 'unknown',
+                ts: Date.now()
+            })
+        } catch(e) {}
     } finally {
         await scrollBottom()
     }

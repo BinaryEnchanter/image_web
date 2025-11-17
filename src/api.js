@@ -53,11 +53,18 @@ export default {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
   },
-  aichat(t) {
+  aichat(payload) {
     const token = localStorage.jwt_token
-    return API.post(`/api/v1/ai/chat`, { message: t }, {
+    const data = typeof payload === 'string' ? { message: payload } : payload
+    return API.post(`/api/v1/ai/chat`, data, {
       headers: { Authorization: token ? `Bearer ${token}` : '' }
     })
+  },
+  myRecommendations(size = 4) {
+    return API.get(`/api/v1/users/me/recommendations?size=${size}`)
+  },
+  similarWallpapers(uuid, size = 4) {
+    return API.get(`/api/v1/wallpapers/${uuid}/similar?size=${size}`)
   },
 
   updateUsername(newUsername) {
