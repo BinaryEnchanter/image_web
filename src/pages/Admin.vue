@@ -2,6 +2,68 @@
 <template>
     <div class="page">
         <section class="card admin-card">
+            <h3>数据统计</h3>
+            <div v-if="loadingStats" class="muted">加载中...</div>
+            <div v-else-if="!stats" class="muted">暂无数据</div>
+            <div v-else class="stats-grid">
+              <div class="card stats-card">
+                <div style="font-weight:700;margin-bottom:6px">今日</div>
+                <div class="row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+                  <div>新用户：{{ stats.today.new_users }}</div>
+                  <div>上传总数：{{ stats.today.uploads_total }}</div>
+                  <div>通过上传：{{ stats.today.uploads_passed }}</div>
+                  <div>失败上传：{{ stats.today.uploads_failed }}</div>
+                  <div>购买数：{{ stats.today.purchases }}</div>
+                  <div>收藏数：{{ stats.today.favorites }}</div>
+                  <div>收入(cents)：{{ stats.today.revenue_cents }}</div>
+                  <div>新增壁纸：{{ stats.today.wallpapers_created }}</div>
+                </div>
+              </div>
+              <div class="card stats-card">
+                <div style="font-weight:700;margin-bottom:6px">本周</div>
+                <div class="row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+                  <div>新用户：{{ stats.week.new_users }}</div>
+                  <div>上传总数：{{ stats.week.uploads_total }}</div>
+                  <div>通过上传：{{ stats.week.uploads_passed }}</div>
+                  <div>失败上传：{{ stats.week.uploads_failed }}</div>
+                  <div>购买数：{{ stats.week.purchases }}</div>
+                  <div>收藏数：{{ stats.week.favorites }}</div>
+                  <div>收入(cents)：{{ stats.week.revenue_cents }}</div>
+                  <div>新增壁纸：{{ stats.week.wallpapers_created }}</div>
+                </div>
+              </div>
+              <div class="card stats-card">
+                <div style="font-weight:700;margin-bottom:6px">本月</div>
+                <div class="row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+                  <div>新用户：{{ stats.month.new_users }}</div>
+                  <div>上传总数：{{ stats.month.uploads_total }}</div>
+                  <div>通过上传：{{ stats.month.uploads_passed }}</div>
+                  <div>失败上传：{{ stats.month.uploads_failed }}</div>
+                  <div>购买数：{{ stats.month.purchases }}</div>
+                  <div>收藏数：{{ stats.month.favorites }}</div>
+                  <div>收入(cents)：{{ stats.month.revenue_cents }}</div>
+                  <div>新增壁纸：{{ stats.month.wallpapers_created }}</div>
+                </div>
+              </div>
+              <div class="card stats-card">
+                <div style="font-weight:700;margin-bottom:6px">总计</div>
+                <div class="row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+                  <div>用户总数：{{ stats.totals.users_total }}</div>
+                  <div>壁纸总数：{{ stats.totals.wallpapers_total }}</div>
+                  <div>公开壁纸：{{ stats.totals.public_wallpapers }}</div>
+                  <div>私有壁纸：{{ stats.totals.private_wallpapers }}</div>
+                  <div>付费壁纸：{{ stats.totals.paid_wallpapers }}</div>
+                  <div>免费壁纸：{{ stats.totals.free_wallpapers }}</div>
+                  <div>上传失败总数：{{ stats.totals.uploads_failed_total }}</div>
+                  <div>上传通过总数：{{ stats.totals.uploads_passed_total }}</div>
+                  <div>下载总数：{{ stats.totals.downloads_total }}</div>
+                  <div>收藏总数：{{ stats.totals.favorites_total }}</div>
+                  <div>总收入(cents)：{{ stats.totals.revenue_total_cents }}</div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="card admin-card">
             <h3>用户角色管理</h3>
             <div class="form">
                 <input v-model="targetUuid" class="input" placeholder="用户 UUID" />
@@ -59,7 +121,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import api from '../api'
 
 const targetUuid = ref('')
@@ -72,6 +134,8 @@ const page = ref(1)
 const size = ref(20)
 const logs = ref([])
 const loadingLogs = ref(false)
+const stats = ref(null)
+const loadingStats = ref(false)
 
 async function setRole() {
     msgRole.value = ''
@@ -105,6 +169,20 @@ function nextPage() { page.value++; loadLogs() }
 
 function formatMeta(m) { return typeof m === 'string' ? m : JSON.stringify(m) }
 function formatTime(t) { try { return new Date(t).toLocaleString() } catch { return String(t) } }
+
+async function loadStats() {
+  try {
+    loadingStats.value = true
+    const r = await api.adminStats()
+    stats.value = r.data
+  } catch (e) {
+    stats.value = null
+  } finally {
+    loadingStats.value = false
+  }
+}
+
+onMounted(()=>{ loadStats() })
 </script>
 
 <style>
@@ -228,4 +306,7 @@ function formatTime(t) { try { return new Date(t).toLocaleString() } catch { ret
         transform: translateY(0)
     }
 }
+.stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:12px }
+.stats-card { padding:12px; min-height:220px; max-height:260px; overflow:auto }
+.stats-card .row { display:grid; grid-template-columns: repeat(2, 1fr); gap:6px }
 </style>

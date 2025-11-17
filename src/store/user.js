@@ -18,8 +18,9 @@ export const useUserStore = defineStore('user', {
         }
       }
     },
-    logout() {
+    async logout() {
       localStorage.removeItem('jwt_token')
+      localStorage.removeItem('current_user')
       this.user = null
     },
     updateCoins(amount) {

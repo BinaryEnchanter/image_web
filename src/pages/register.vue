@@ -22,11 +22,12 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import api from '../api'
 import { useUserStore } from '../store/user'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 
 const username = ref('')
@@ -50,7 +51,7 @@ async function doRegister() {
       localStorage.setItem('jwt_token', token)
       localStorage.setItem('current_user', JSON.stringify(res.data))
       await userStore.load()
-      router.push('/')
+      router.push(route.query.redirect || '/')
     }
   } catch (e) {
     error.value = e.response?.data?.message || '注册失败'
@@ -58,7 +59,7 @@ async function doRegister() {
 }
 
 function goLogin() {
-  router.push('/login')
+  router.push({ path: '/login', query: { redirect: route.query.redirect } })
 }
 </script>
 
