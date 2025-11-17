@@ -7,6 +7,7 @@ class AIRecognition {
     this.mobilenetModel = null;
     this.cocoModel = null;
     this.isInitialized = false;
+    this._initPromise = null;
     
     // 缓存已翻译的词汇
     this.translationCache = new Map();
@@ -84,25 +85,26 @@ class AIRecognition {
 
   // 初始化模型
   async init() {
-    try {
-      console.log('正在加载AI模型...');
-      
-      // 并行加载两个模型
-      const [mobilenetModel, cocoModel] = await Promise.all([
-        mobilenet.load(),
-        cocossd.load()
-      ]);
-      
-      this.mobilenetModel = mobilenetModel;
-      this.cocoModel = cocoModel;
-      this.isInitialized = true;
-      
-      console.log('AI模型加载完成');
-      return true;
-    } catch (error) {
-      console.error('AI模型加载失败:', error);
-      return false;
-    }
+    if (this.isInitialized) return true;
+    if (this._initPromise) return this._initPromise;
+    this._initPromise = (async () => {
+      try {
+        console.log('正在加载AI模型...');
+        const [mobilenetModel, cocoModel] = await Promise.all([
+          mobilenet.load(),
+          cocossd.load()
+        ]);
+        this.mobilenetModel = mobilenetModel;
+        this.cocoModel = cocoModel;
+        this.isInitialized = true;
+        console.log('AI模型加载完成');
+        return true;
+      } catch (error) {
+        console.error('AI模型加载失败:', error);
+        return false;
+      }
+    })();
+    return this._initPromise;
   }
 
   // 从图片元素进行识别

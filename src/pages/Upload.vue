@@ -19,9 +19,8 @@
 
         <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
           <input v-model="name" class="input" placeholder="名称（必填）" />
-          <button class="btn" @click="generateName" 
-                  :disabled="aiNameLoading || !aiModelsLoaded"
-                  style="white-space: nowrap">
+          <button class="btn" @click="generateName" :disabled="aiNameLoading || !aiModelsLoaded"
+            style="white-space: nowrap">
             {{ aiNameLoading ? '生成中...' : 'AI 生成名称' }}
           </button>
         </div>
@@ -39,8 +38,7 @@
           </div>
 
           <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-            <button class="btn" @click="generateTags" 
-                    :disabled="aiTagsLoading || !aiModelsLoaded">
+            <button class="btn" @click="generateTags" :disabled="aiTagsLoading || !aiModelsLoaded">
               {{ aiTagsLoading ? '分析中...' : 'AI 生成标签' }}
             </button>
             <button class="btn ghost" @click="clearTags">清空标签</button>
@@ -204,7 +202,7 @@ async function generateTags() {
   msg.value = null
   aiSuggestions.value = []
   const f = fileInput.value?.files?.[0]
-  
+
   if (!f) {
     msg.value = '请先选择图片文件'
     msgType.value = 'error'
@@ -220,13 +218,13 @@ async function generateTags() {
   try {
     aiTagsLoading.value = true
     msg.value = 'AI正在分析图片...'
-    
+
     // 使用本地AI识别
     const results = await aiRecognition.recognizeFromFile(f)
     const suggestedTags = await aiRecognition.generateTagsFromResults(results)
-    
+
     aiSuggestions.value = suggestedTags
-    
+
     if (suggestedTags.length === 0) {
       msg.value = 'AI未能识别出明显特征'
     } else {
@@ -234,7 +232,7 @@ async function generateTags() {
       msgType.value = 'success'
       setTimeout(() => { msg.value = null }, 3000)
     }
-    
+
   } catch (error) {
     console.error('AI标签生成失败:', error)
     msg.value = 'AI分析失败，请重试或手动输入标签'
@@ -248,7 +246,7 @@ async function generateTags() {
 async function generateName() {
   msg.value = null
   const f = fileInput.value?.files?.[0]
-  
+
   if (!f) {
     msg.value = '请先选择图片文件'
     msgType.value = 'error'
@@ -264,16 +262,16 @@ async function generateName() {
   try {
     aiNameLoading.value = true
     msg.value = 'AI正在生成名称...'
-    
+
     // 使用本地AI识别
     const results = await aiRecognition.recognizeFromFile(f)
     const suggestedName = await aiRecognition.generateNameFromResults(results)
-    
+
     name.value = suggestedName
     msg.value = 'AI名称生成完成'
     msgType.value = 'success'
     setTimeout(() => { msg.value = null }, 3000)
-    
+
   } catch (error) {
     console.error('AI名称生成失败:', error)
     msg.value = 'AI名称生成失败，请手动输入'
@@ -314,7 +312,7 @@ async function upload() {
     // 上传完成后可选择清空或保留当前状态
   } catch (e) {
     console.error(e)
-    msg.value = e.response?.data?.message || '上传失败'
+    msg.value = e.response?.data?.message || e.response?.data?.error || '上传失败'
     msgType.value = 'error'
   } finally {
     uploading.value = false
