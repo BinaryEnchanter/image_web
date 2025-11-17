@@ -17,7 +17,7 @@
       </section>
 
       <section v-if="isLogged && recs.length" class="card">
-        <div class="section-head">
+        <div class="section-header">
           <h3>为你推荐</h3>
           <div class="muted">基于你的喜好</div>
         </div>
@@ -33,7 +33,7 @@
 
       <!-- 推荐壁纸 -->
       <section class="card">
-        <div class="section-head">
+        <div class="section-header">
           <h3>推荐壁纸</h3>
           <div class="muted">为你精选的热门内容</div>
         </div>
