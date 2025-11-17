@@ -223,7 +223,7 @@ async function generateTags() {
     
     // 使用本地AI识别
     const results = await aiRecognition.recognizeFromFile(f)
-    const suggestedTags = aiRecognition.generateTagsFromResults(results)
+    const suggestedTags = await aiRecognition.generateTagsFromResults(results)
     
     aiSuggestions.value = suggestedTags
     
@@ -267,7 +267,7 @@ async function generateName() {
     
     // 使用本地AI识别
     const results = await aiRecognition.recognizeFromFile(f)
-    const suggestedName = aiRecognition.generateNameFromResults(results)
+    const suggestedName = await aiRecognition.generateNameFromResults(results)
     
     name.value = suggestedName
     msg.value = 'AI名称生成完成'
