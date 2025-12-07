@@ -70,7 +70,15 @@
                     d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
                   </path>
                 </svg>
-                <span>{{ item.favoriteCount || 0 }}</span>
+                <span>{{ item.favorite_count ?? item.favoriteCount ?? 0 }}</span>
+              </div>
+              <div class="item-downloads">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v8" />
+                  <path d="M8 9l4 4 4-4" />
+                  <path d="M5 19h14" />
+                </svg>
+                <span>{{ item.download_count ?? item.downloadCount ?? 0 }}</span>
               </div>
             </div>
           </div>
@@ -487,26 +495,26 @@ body {
   justify-content: space-between;
 }
 
-.item-likes {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-muted);
-  font-size: 14px;
-  transition: color 0.25s ease;
-}
+.item-likes, .item-downloads {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: color 0.25s ease;
+  }
 
-.item-link:hover .item-likes {
-  color: #ef4444;
-}
+.item-link:hover .item-likes, .item-link:hover .item-downloads {
+    color: #ef4444;
+  }
 
-.item-likes svg {
-  transition: transform 0.25s ease;
-}
+.item-likes svg, .item-downloads svg {
+    transition: transform 0.25s ease;
+  }
 
-.item-link:hover .item-likes svg {
-  transform: scale(1.1);
-}
+.item-link:hover .item-likes svg, .item-link:hover .item-downloads svg {
+    transform: scale(1.1);
+  }
 
 /* ========== 响应式 ========== */
 @media (max-width: 1200px) {
