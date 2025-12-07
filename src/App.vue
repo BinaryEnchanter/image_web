@@ -34,14 +34,14 @@
               <span>壁纸</span>
             </router-link>
 
-            <a href="https://deskimage.filecloudonline.com/url/ugrcqnvdr2tyfwpn" class="nav-link" target="_blank" rel="noopener">
+            <router-link to="/download" class="nav-link">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 5v8" />
                 <path d="M8 9l4 4 4-4" />
                 <path d="M5 19h14" />
               </svg>
               <span>下载客户端</span>
-            </a>
+            </router-link>
 
             <div v-if="!user" class="auth-section">
               <router-link to="/login" class="btn-primary">
@@ -135,14 +135,14 @@
               </svg>
               壁纸
             </router-link>
-            <a href="https://deskimage.filecloudonline.com/url/ugrcqnvdr2tyfwpn" class="mobile-link" target="_blank" rel="noopener" @click="mobileMenuOpen = false">
+            <router-link to="/download" class="mobile-link" @click="mobileMenuOpen = false">
               <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M12 5v8" />
                 <path d="M8 9l4 4 4-4" />
                 <path d="M5 19h14" />
               </svg>
               下载客户端
-            </a>
+            </router-link>
             <div v-if="user">
               <router-link to="/upload" class="mobile-link" @click="mobileMenuOpen = false">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -197,7 +197,6 @@
           </div>
         </div>
         <div class="footer-bottom">
-          <p>© {{ new Date().getFullYear() }} 壁纸中心 — 演示前端</p>
           <div class="footer-social">
             <a href="#" class="social-link">
               <svg viewBox="0 0 24 24" fill="currentColor">
