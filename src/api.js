@@ -1,7 +1,7 @@
 import axios from 'axios'
 const API = axios.create({
   baseURL: 'http://118.178.195.70:8080',
-  timeout: 10000
+  timeout: 50000
 })
 
 // interceptor to attach JWT if present
