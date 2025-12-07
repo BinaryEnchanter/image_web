@@ -38,17 +38,42 @@
           <div class="muted">为你精选的热门内容</div>
         </div>
 
-        <section class="grid">
-          <div v-for="item in items" :key="item.uuid" class="tile card">
-            <router-link :to="`/image/${item.uuid}`">
-              <img :src="item.thumbUrl || placeholder(item.uuid)" class="thumb" />
-            </router-link>
-
-            <div class="meta" style="padding-top:8px;display:flex;justify-content:space-between;align-items:center">
-              <div class="title">{{ item.name || '未命名' }}</div>
-              <div class="fav"><span style="font-size:13px;color:var(--muted)">{{ item.favoriteCount || 0 }}</span> ❤
+        <section class="gallery">
+          <div v-for="(item, idx) in items" :key="item.uuid" class="gallery-item" :style="{ animationDelay: `${idx * 0.05}s` }">
+            <router-link :to="`/image/${item.uuid}`" class="item-link">
+              <div class="item-image-wrapper">
+                <img :src="item.thumbUrl || placeholder(item.uuid)" class="item-image" :alt="item.name || '壁纸'" />
+                <div class="item-overlay">
+                  <div class="overlay-content">
+                    <svg class="overlay-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 8 16 12 12 16"></polyline>
+                      <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                  </div>
+                </div>
               </div>
-            </div>
+
+              <div class="item-info">
+                <h3 class="item-title">{{ item.name || '未命名壁纸' }}</h3>
+                <div class="item-meta">
+                  <div class="item-likes">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span>{{ item.favorite_count ?? item.favoriteCount ?? 0 }}</span>
+                  </div>
+                  <div class="item-downloads">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v8" />
+                      <path d="M8 9l4 4 4-4" />
+                      <path d="M5 19h14" />
+                    </svg>
+                    <span>{{ item.download_count ?? item.downloadCount ?? 0 }}</span>
+                  </div>
+                </div>
+              </div>
+            </router-link>
           </div>
         </section>
       </section>
@@ -286,4 +311,27 @@ export default {
     min-width: 120px;
   }
 }
+.gallery{max-width:1100px;margin:0 auto;padding:0 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.gallery-item{animation:slideUp .6s cubic-bezier(.16,1,.3,1) both}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.item-link{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:20px;overflow:hidden;transition:all .4s cubic-bezier(.16,1,.3,1);position:relative}
+.item-link:hover{transform:translateY(-12px);box-shadow:0 24px 56px rgba(0,0,0,.4);border-color:rgba(255,255,255,.12)}
+.item-image-wrapper{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden}
+.item-image{width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.item-link:hover .item-image{transform:scale(1.08)}
+.item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(11,18,32,.8),transparent 50%);opacity:0;transition:opacity .4s ease;display:flex;align-items:center;justify-content:center}
+.item-link:hover .item-overlay{opacity:1}
+.overlay-content{transform:translateY(20px);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.item-link:hover .overlay-content{transform:translateY(0)}
+.overlay-icon{color:#fff;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))}
+.item-info{padding:20px;position:relative;z-index:2}
+.item-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item-meta{display:flex;align-items:center;justify-content:space-between}
+.item-likes,.item-downloads{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;transition:color .25s ease}
+.item-link:hover .item-likes,.item-link:hover .item-downloads{color:var(--accent)}
+.item-likes svg,.item-downloads svg{transition:transform .25s ease}
+.item-link:hover .item-likes svg,.item-link:hover .item-downloads svg{transform:scale(1.1)}
+@media (max-width:980px){.gallery{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:560px){.gallery{grid-template-columns:1fr}}
 </style>
