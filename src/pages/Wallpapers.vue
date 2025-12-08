@@ -90,12 +90,14 @@
 
 <script>
 import api from '../api'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default {
   setup() {
     const items = ref([])
     const q = ref('')
+    const route = useRoute()
 
     async function load() {
       try {
@@ -131,7 +133,25 @@ export default {
       load()
     }
 
-    onMounted(load)
+    onMounted(() => {
+      const term = typeof route.query.search === 'string' ? route.query.search : ''
+      if (term && term.trim()) {
+        q.value = term
+        search(term)
+      } else {
+        load()
+      }
+    })
+
+    watch(() => route.query.search, (val) => {
+      const term = typeof val === 'string' ? val : ''
+      q.value = term
+      if (term && term.trim()) {
+        search(term)
+      } else {
+        load()
+      }
+    })
 
     return {
       items,
